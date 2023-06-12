@@ -3,6 +3,7 @@ const app = express();
 const PORT = 3000;
 
 app.set('view engine', 'ejs');
+app.use(express.urlencoded({ extended: true }));
 
 const urlDatabase = {
   b2xVn2: 'http://www.lighthouselabs.ca',
@@ -31,16 +32,20 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
+app.get('/urls/new', (req, res) => {
+  res.render('urls_new');
+});
+
 app.get('/urls/:id', (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
   res.render('urls_show', templateVars);
 });
 
-// app.get('/set', (req, res) => {
-//   const a = 1;
-//   res.send(`a = ${a}`);
-// });
+app.post('/urls', (req, res) => {
+  console.log(req.body);
+  res.send('Ok');
+});
 
-// app.get('/fetch', (req, res) => {
-//   res.send(`a = ${a}`);
-// });
+const generateRandomString = () => {
+  
+};
