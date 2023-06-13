@@ -32,7 +32,7 @@ app.get('/hello', (req, res) => {
 app.get('/urls', (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"],
+    username: req.cookies['username'],
   };
   res.render('urls_index', templateVars);
 });
@@ -70,6 +70,11 @@ app.post('/urls/:id/edit', (req, res) => {
 
 app.post('/login', (req, res) => {
   res.cookie('username', req.body.username);
+  res.redirect('/urls');
+});
+
+app.post('/logout', (req, res) => {
+  res.clearCookie('username');
   res.redirect('/urls');
 });
 
