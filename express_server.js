@@ -56,4 +56,11 @@ app.post('/urls/:id/delete', (req, res) => {
   res.redirect('/urls');
 });
 
-const generateRandomString = () => {};
+app.post('/urls/:id/edit', (req, res) => {
+  if (req.body.newURL !== '') {
+    urlDatabase[req.params.id] = req.body.newURL;
+  }
+  res.redirect('/urls');
+});
+
+// const generateRandomString = () => {};
