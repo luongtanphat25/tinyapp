@@ -90,12 +90,26 @@ app.post('/urls/:id/edit', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  res.cookie('username', req.body.username);
-  res.redirect(req.get('referer'));
+  const email = req.body.email;
+  const password = req.body.password;
+  const user = getUserByEmail(email);
+  if (!user) {
+    res.statusCode = 400;
+    res.send('Email not registerded yet');
+    return;
+  }
+  if (password !== user.password) {
+    res.statusCode = 400;
+    res.send('Password incorrect');
+    return;
+  } else {
+    res.cookie('user_id', user.id);
+    res.redirect('/urls');
+  }
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect(req.get('referer'));
 });
 
@@ -132,11 +146,18 @@ app.post('/register', (req, res) => {
   res.redirect('/urls');
 });
 
+app.get('/login', (req, res) => {
+  const templateVars = {
+    username: req.cookies.user_id ? users[req.cookies.user_id].email : '',
+  };
+  res.render('login', templateVars);
+});
+
 const getUserByEmail = (email) => {
   for (const user in users) {
-    if (users[user].email === email) return true;
+    if (users[user].email === email) return users[user];
   }
-  return false;
+  return;
 };
 
 const generateRandomString = (length) => {
