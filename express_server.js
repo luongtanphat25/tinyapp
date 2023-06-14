@@ -12,6 +12,19 @@ const urlDatabase = {
   '9sm5xK': 'http://www.google.com',
 };
 
+const users = {
+  userRandomID: {
+    id: 'userRandomID',
+    email: 'user@example.com',
+    password: 'purple-monkey-dinosaur',
+  },
+  user2RandomID: {
+    id: 'user2RandomID',
+    email: 'user2@example.com',
+    password: 'dishwasher-funk',
+  },
+};
+
 app.get('/', (req, res) => {
   res.send('Hello');
 });
@@ -32,17 +45,24 @@ app.get('/hello', (req, res) => {
 app.get('/urls', (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies['username'],
+    username: req.cookies.user_id ? users[req.cookies.user_id].email : '',
   };
   res.render('urls_index', templateVars);
 });
 
 app.get('/urls/new', (req, res) => {
-  res.render('urls_new');
+  const templateVars = {
+    username: req.cookies.user_id ? users[req.cookies.user_id].email : '',
+  };
+  res.render('urls_new', templateVars);
 });
 
 app.get('/urls/:id', (req, res) => {
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
+  const templateVars = {
+    id: req.params.id,
+    longURL: urlDatabase[req.params.id],
+    username: req.cookies.user_id ? users[req.cookies.user_id].email : '',
+  };
   res.render('urls_show', templateVars);
 });
 
@@ -70,12 +90,39 @@ app.post('/urls/:id/edit', (req, res) => {
 
 app.post('/login', (req, res) => {
   res.cookie('username', req.body.username);
-  res.redirect('/urls');
+  res.redirect(req.get('referer'));
 });
 
 app.post('/logout', (req, res) => {
   res.clearCookie('username');
+  res.redirect(req.get('referer'));
+});
+
+app.get('/register', (req, res) => {
+  const templateVars = {
+    username: req.cookies.user_id ? users[req.cookies.user_id].email : '',
+  };
+
+  res.render('register', templateVars);
+});
+
+app.post('/register', (req, res) => {
+  let id = '';
+  do {
+    id = generateRandomString(6);
+  } while (id in users);
+  users[`${id}`] = { id, email: req.body.email, password: req.body.password };
+
+  res.cookie('user_id', id);
   res.redirect('/urls');
 });
 
-// const generateRandomString = () => {};
+const generateRandomString = (length) => {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+};
