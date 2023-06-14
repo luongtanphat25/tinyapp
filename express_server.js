@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const PORT = 3000;
 const cookieParser = require('cookie-parser');
+const e = require('express');
 
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
@@ -107,15 +108,36 @@ app.get('/register', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  if (!email || !password) {
+    res.statusCode = 400;
+    res.send('Email or password empty');
+    return;
+  }
+
+  if (getUserByEmail(email)) {
+    res.statusCode = 400;
+    res.send('Email already registerd');
+    return;
+  }
+
   let id = '';
   do {
     id = generateRandomString(6);
   } while (id in users);
-  users[`${id}`] = { id, email: req.body.email, password: req.body.password };
+  users[`${id}`] = { id, email: email, password: password };
 
   res.cookie('user_id', id);
   res.redirect('/urls');
 });
+
+const getUserByEmail = (email) => {
+  for (const user in users) {
+    if (users[user].email === email) return true;
+  }
+  return false;
+};
 
 const generateRandomString = (length) => {
   let result = '';
