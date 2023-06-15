@@ -138,7 +138,7 @@ app.delete('/urls/:id', (req, res) => {
 });
 
 //edit url
-app.post('/urls/:id/edit', (req, res) => {
+app.put('/urls/:id', (req, res) => {
   const { id } = req.params;
   const username = req.session.user_id ? users[req.session.user_id].email : '';
 
