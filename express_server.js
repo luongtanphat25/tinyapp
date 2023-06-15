@@ -125,7 +125,7 @@ app.get('/u/:id', (req, res) => {
 });
 
 //delete url
-app.post('/urls/:id/delete', (req, res) => {
+app.delete('/urls/:id', (req, res) => {
   const { id } = req.params;
   const username = req.session.user_id ? users[req.session.user_id].email : '';
 
