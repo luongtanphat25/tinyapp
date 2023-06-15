@@ -88,18 +88,24 @@ app.get('/urls/:id', (req, res) => {
     username: '',
   };
 
-  if (req.session.user_id) {
-    const user = users[req.session.user_id];
-    const url = urlDatabase[id];
-
-    if (url && url.userID === req.session.user_id) {
-      templateVars.longURL = url.longURL;
-      templateVars.username = user.email;
-      return res.render('urls_show', templateVars);
-    }
+  if (!req.session.user_id) {
+    return res.status(400).send('Only logged-in user can access.');
   }
 
-  res.status(400).send('Only the user who created the URL can see it.');
+  const user = users[req.session.user_id];
+  const url = urlDatabase[id];
+
+  if (!url) {
+    return res.status(400).send('Invalid shortURL');
+  }
+
+  if (user.id !== urlDatabase[id].userID) {
+    return res.status(400).send('Only user who created this url can access.');
+  }
+
+  templateVars.longURL = url.longURL;
+  templateVars.username = user.email;
+  return res.render('urls_show', templateVars);
 });
 
 app.post('/urls', (req, res) => {
