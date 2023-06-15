@@ -30,7 +30,7 @@
         <tbody>
           <% for (const id in urls) { %>
           <tr>
-            <td><%= id %></td>
+            <td><a href="/u/<%= id %>"><%= id %></a></td>
             <td><%= urls[id] %></td>
             <td>
               <form method="GET" action="/urls/<%= id %>">
