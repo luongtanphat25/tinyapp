@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const PORT = 3000;
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
 
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
@@ -105,7 +106,7 @@ app.get('/u/:id', (req, res) => {
   }
 });
 
-//MODIFIFEisdfasdf
+//delete url
 app.post('/urls/:id/delete', (req, res) => {
   const username = req.cookies.user_id ? users[req.cookies.user_id].email : '';
 
@@ -117,7 +118,7 @@ app.post('/urls/:id/delete', (req, res) => {
   }
 });
 
-//MODIFIed here
+//edit url
 app.post('/urls/:id/edit', (req, res) => {
   const username = req.cookies.user_id ? users[req.cookies.user_id].email : '';
   if (username && urlDatabase[req.params.id].userID === username) {
@@ -130,6 +131,7 @@ app.post('/urls/:id/edit', (req, res) => {
   }
 });
 
+//login to account
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -139,7 +141,7 @@ app.post('/login', (req, res) => {
     res.send('Email not registerded yet');
     return;
   }
-  if (password !== user.password) {
+  if (!bcrypt.compareSync(password, user.password)) {
     res.statusCode = 400;
     res.send('Password incorrect');
     return;
@@ -165,9 +167,11 @@ app.get('/register', (req, res) => {
   }
 });
 
+//create user account
 app.post('/register', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
   if (!email || !password) {
     res.statusCode = 400;
     res.send('Email or password empty');
@@ -184,7 +188,7 @@ app.post('/register', (req, res) => {
   do {
     id = generateRandomString(6);
   } while (id in users);
-  users[`${id}`] = { id, email: email, password: password };
+  users[`${id}`] = { id, email: email, password: hashedPassword };
 
   res.cookie('user_id', id);
   res.redirect('/urls');
