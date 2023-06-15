@@ -5,6 +5,7 @@ const PORT = 3000;
 // const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
+const { getUserByEmail, generateRandomString, urlsForUser, createShortURL } = require('./helper');
 
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
@@ -59,7 +60,7 @@ app.get('/hello', (req, res) => {
 
 app.get('/urls', (req, res) => {
   const userID = req.session.user_id;
-  const urls = urlsForUser(userID);
+  const urls = urlsForUser(userID, urlDatabase);
   const templateVars = {
     urls: urls,
     username: req.session.user_id ? users[req.session.user_id].email : '',
@@ -104,7 +105,7 @@ app.get('/urls/:id', (req, res) => {
 app.post('/urls', (req, res) => {
   if (req.session.user_id) {
     const { longURL } = req.body;
-    createShortURL(longURL, req.session.user_id);
+    createShortURL(longURL, req.session.user_id, urlDatabase);
     res.redirect('/urls');
   } else {
     res.status(400).send('Only users can create new URLs.');
@@ -153,7 +154,7 @@ app.post('/urls/:id/edit', (req, res) => {
 //login to account
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email, users);
 
   if (!user) {
     res.status(400).send('Email not registered yet');
@@ -197,7 +198,7 @@ app.post('/register', (req, res) => {
     return;
   }
 
-  if (getUserByEmail(email)) {
+  if (getUserByEmail(email, users)) {
     res.status(400).send('Email already registered');
     return;
   }
@@ -219,55 +220,3 @@ app.get('/login', (req, res) => {
 
   res.render('login', templateVars);
 });
-
-const getUserByEmail = (email) => {
-  for (const user in users) {
-    if (users[user].email === email) return users[user];
-  }
-  return;
-};
-
-const createShortURL = (url, id) => {
-  for (const shortURL in urlDatabase) {
-    if (urlDatabase[shortURL].longURL === url) {
-      console.log('URL already exists');
-      return;
-    }
-  }
-
-  let short;
-  do {
-    short = generateRandomString(6);
-  } while (short in urlDatabase);
-
-  urlDatabase[short] = {
-    longURL: url,
-    userID: id,
-  };
-};
-
-const generateRandomString = (length) => {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
-
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    result += characters[randomIndex];
-  }
-
-  return result;
-};
-
-const urlsForUser = (id) => {
-  const userURLs = {};
-
-  for (const shortURL in urlDatabase) {
-    const { userID, longURL } = urlDatabase[shortURL];
-
-    if (userID === id) {
-      userURLs[shortURL] = longURL;
-    }
-  }
-
-  return userURLs;
-};
