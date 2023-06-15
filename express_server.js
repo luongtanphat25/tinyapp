@@ -2,7 +2,7 @@
 const express = require('express');
 const app = express();
 const PORT = 3000;
-// const cookieParser = require('cookie-parser');
+const methodOverride = require('method-override');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 const { getUserByEmail, generateRandomString, urlsForUser, createShortURL } = require('./helper');
@@ -16,6 +16,8 @@ app.use(
     maxAge: 24 * 60 * 60 * 1000,
   })
 );
+
+app.use(methodOverride('_method'));
 
 const urlDatabase = {
   b6UTxQ: {
