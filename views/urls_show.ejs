@@ -15,19 +15,15 @@
 
     <%- include('partials/_header') %>
     
-    <div class="card text-center">
-      <div class="card-header"></div>
-      <div class="card-body">
-        <h5 class="card-title">TinyURL for: <%= longURL %></h5>
-        <p class="card-text">Short URL ID: <a href="/u/<%= id %>"><%= id %></a></p>
-      </div>
-      <div class="card-footer">
+    <div class="card m-3">
+      <h5 class="card-header">TinyURL for: <%= longURL %></h5>
+      <p class="card-body pb-0">Short URL ID: <a class="btn btn-outline-success" href="/u/<%= id %>"><%= id %></a></p>
+      <div class="card-footer py-3">
         <form method="POST" action="/urls/<%- id %>?_method=PUT" class="center m-auto">
-          <h5 class="card-title">Edit</h3>
-          <div class="input-group mb-3">
-            <span class="input-group-text mr-3">New URL</span>
+          <div class="input-group">
+            <span class="input-group-text mr-3">Edit: New URL</span>
             <input type="text" placeholder="https://www.example.com/" class="form-control" name="newURL">
-            <button type="submit" class="btn btn-primary ml-3">Submit</button>
+            <button type="submit" class="btn btn-success ml-3">Submit</button>
           </div>
         </form>
       </div>

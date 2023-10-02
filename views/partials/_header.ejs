@@ -14,7 +14,7 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <ul class="navbar-nav">
+        <ul class="navbar-nav me-auto">
           <li class="nav-item">
             <a class="nav-item nav-link" href="/urls">My URLs</a>
           </li>
@@ -24,8 +24,8 @@
         </ul>
         <% if (username) { %>
         <form class="navbar-nav" method="post" action="/logout">
-          <span class="navbar-text">Hi, <%= username %></span>
-          <button class="nav-item btn btn-outline-light" type="submit">Logout</button>
+          <span class="navbar-text">Hi, <%= username %> </span>
+          <button class="nav-item btn btn-outline-light ms-2" type="submit">Logout</button>
         </form>
         <% } else { %>
         <ul class="navbar-nav float-end" >
