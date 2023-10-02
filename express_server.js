@@ -44,7 +44,7 @@ const users = {
 };
 
 app.get('/', (req, res) => {
-  res.send('Hello');
+  res.redirect('/urls');
 });
 
 app.listen(PORT, () => {
@@ -53,11 +53,6 @@ app.listen(PORT, () => {
 
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
-});
-
-app.get('/hello', (req, res) => {
-  const templateVars = { greetings: 'Hello World!' };
-  res.render('hello_world', templateVars);
 });
 
 app.get('/urls', (req, res) => {
