@@ -2,7 +2,7 @@
 const express = require('express');
 const app = express();
 const PORT = 3000;
-// const cookieParser = require('cookie-parser');
+const methodOverride = require('method-override');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 const { getUserByEmail, generateRandomString, urlsForUser, createShortURL } = require('./helper');
@@ -16,6 +16,8 @@ app.use(
     maxAge: 24 * 60 * 60 * 1000,
   })
 );
+
+app.use(methodOverride('_method'));
 
 const urlDatabase = {
   b6UTxQ: {
@@ -42,7 +44,7 @@ const users = {
 };
 
 app.get('/', (req, res) => {
-  res.send('Hello');
+  res.redirect('/urls');
 });
 
 app.listen(PORT, () => {
@@ -51,11 +53,6 @@ app.listen(PORT, () => {
 
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
-});
-
-app.get('/hello', (req, res) => {
-  const templateVars = { greetings: 'Hello World!' };
-  res.render('hello_world', templateVars);
 });
 
 app.get('/urls', (req, res) => {
@@ -129,7 +126,7 @@ app.get('/u/:id', (req, res) => {
 });
 
 //delete url
-app.post('/urls/:id/delete', (req, res) => {
+app.delete('/urls/:id', (req, res) => {
   const { id } = req.params;
   const username = req.session.user_id ? users[req.session.user_id].email : '';
 
@@ -142,7 +139,7 @@ app.post('/urls/:id/delete', (req, res) => {
 });
 
 //edit url
-app.post('/urls/:id/edit', (req, res) => {
+app.put('/urls/:id', (req, res) => {
   const { id } = req.params;
   const username = req.session.user_id ? users[req.session.user_id].email : '';
 
